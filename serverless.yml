@@ -1,0 +1,33 @@
+org: finnauto
+
+service: sls-dd-test
+app: sls-dd-test
+
+frameworkVersion: '1.83'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: development
+  region: eu-central-1
+
+custom:
+  datadog_forwarder:
+    site: ${opt:datadog-site, 'datadoghq.eu'}
+    forwarder: ${opt:datadog-forwarder, ''}
+  datadog_extension:
+    site: ${opt:datadog-site, 'datadoghq.eu'}
+    addExtension: true
+    apiKey: ${opt:datadog-api-key, ''}
+  datadog: ${self:custom.datadog_${opt:datadog-type, 'forwarder'}}
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+
+plugins:
+  - serverless-plugin-datadog
